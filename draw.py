@@ -7,7 +7,7 @@ def add_polygon( points, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(points, x1, y1, z1)
     add_point(points, x2, y2, z2)
 
-def draw_polygons( points, screen, color ):
+def draw_polygons( matrix, screen, color ):
     if len(matrix) < 3:
         print 'Need at least 3 points to draw a polygon'
         return
@@ -38,6 +38,19 @@ def add_box( points, x, y, z, width, height, depth ):
     #front
     add_polygon(points, x, y, z, x, y-height, z, x+width, y-height, z)
     add_polygon(points, x, y, z, x+width, y, z, x+width, y-height, z)
+    #right side
+    add_polygon(points, x+width, y, z, x+width, y-height, z, x+width,y-height,z-depth)
+    add_polygon(points, x+width, y, z, x+width, y, z-depth, x+width, y-height, z-depth)
+    #left side
+    add_polygon(points, x, y, z, x, y, z-depth, x, y-height, z)
+    add_polygon(points, x, y, z-depth, x, y-height, z-depth, x, y-height, z)
+    #bottom
+    add_polygon(points, x, y-height, z, x, y-height, z-depth, x+width, y-height, z-depth)
+    add_polygon(points, x+width, y-height, z, x+width, y-height, z-depth, x, y-height, z)
+    #back
+    add_polygon(points, x, y, z-depth, x+width, y, z-depth, x+width, y-height, z-depth)
+
+    add_polygon(points, x, y, z-depth, x, y-height, z-depth, x+width, y-height, z-depth)
     '''
     #edge method
     x1 = x + width
