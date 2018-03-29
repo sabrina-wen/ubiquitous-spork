@@ -87,8 +87,7 @@ def add_sphere( edges, cx, cy, cz, r, step ):
     for lat in range(lat_start, lat_stop):
         for longt in range(longt_start, longt_stop+1):
             index = lat * step + longt
-
-            add_edge(edges, points[index][0],
+            add_polygon(edges, points[index][0],
                      points[index][1],
                      points[index][2],
                      points[index][0]+1,
@@ -96,6 +95,7 @@ def add_sphere( edges, cx, cy, cz, r, step ):
                      points[index][2]+1 )
 
 def generate_sphere( cx, cy, cz, r, step ):
+    #triangle mesh method
     points = []
 
     rot_start = 0
@@ -136,6 +136,10 @@ def add_torus( edges, cx, cy, cz, r0, r1, step ):
                      points[index][2]+1 )
 
 def generate_torus( cx, cy, cz, r0, r1, step ):
+    # triangle method
+
+    
+    ''' edge method
     points = []
     rot_start = 0
     rot_stop = step
@@ -152,7 +156,7 @@ def generate_torus( cx, cy, cz, r0, r1, step ):
             z = -1*math.sin(2*math.pi * rot) * (r0 * math.cos(2*math.pi * circ) + r1) + cz;
 
             points.append([x, y, z])
-    return points
+    return points'''
 
 def add_circle( points, cx, cy, cz, r, step ):
     x0 = r + cx
