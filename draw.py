@@ -83,7 +83,7 @@ def add_sphere( edges, cx, cy, cz, r, step ):
     longt_start = 0
     longt_stop = step
 
-    step+= 1
+    step += 1
     for lat in range(lat_start, lat_stop):
         for longt in range(longt_start, longt_stop+1):
             index = lat * step + longt
@@ -93,6 +93,18 @@ def add_sphere( edges, cx, cy, cz, r, step ):
                      points[index][0]+1,
                      points[index][1]+1,
                      points[index][2]+1 )
+
+    # backface culling
+    for triangle in range(0, points.length[0], 3):
+        # calculate n (surface vector)
+        # calculate vec a first
+        a_vec = new_matrix(1, 3)
+        add_point(a_vec, points[triangle + 1][0] - points[triangle][0], points[triangle + 1][1] - points[triangle][1], points[triangle + 1][2] - points[triangle][2])
+        b_vec = new_matrix(1, 3)
+        add_point(b_vec, points[triangle + 2][0] - points[triangle][0], points[triangle + 2][1] - points[triangle][1], points[triangle + 2][2] - points[triangle][2])
+        matrix_mult(a_vec, b_vec) # b_vec is now n (surface vector)
+        #find theta
+        nxv =
 
 def generate_sphere( cx, cy, cz, r, step ):
     #triangle mesh method
