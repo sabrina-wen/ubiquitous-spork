@@ -1,5 +1,20 @@
 import math
 
+
+def create_vector(p0, p1):
+    vec = []
+    vec.append(p1[0] - p0[0])
+    vec.append(p1[1] - p0[1])
+    vec.append(p1[2] - p0[1])
+    return vec
+
+def cross_product(v0, v1):
+    vec = []
+    vec.append(v0[1] * v1[2] - v0[2] * v1[1])
+    vec.append(v0[2] * v1[0] - v0[0] * v1[2])
+    vec.append(v0[0] *v1 [1] - v0[1] * v1[0])
+    return vec
+
 def make_bezier():
     return [
         [-1, 3, -3, 1],
@@ -89,7 +104,7 @@ def scalar_mult( matrix, s ):
     for r in range( len( matrix[0] ) ):
         for c in range( len(matrix) ):
             matrix[c][r]*= s
-            
+
 #m1 * m2 -> m2
 def matrix_mult( m1, m2 ):
 
@@ -97,7 +112,7 @@ def matrix_mult( m1, m2 ):
     for row in m2:
         #get a copy of the next point
         tmp = row[:]
-        
+
         for r in range(4):
             m2[point][r] = (m1[0][r] * tmp[0] +
                             m1[1][r] * tmp[1] +

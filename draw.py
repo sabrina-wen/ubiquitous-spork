@@ -11,46 +11,42 @@ def draw_polygons( matrix, screen, color ):
     if len(matrix) < 3:
         print 'Need at least 3 points to draw a polygon'
         return
-    point = 0
-    while point < len(matrix) - 1:
-        draw_line( int(matrix[point][0]),
-                   int(matrix[point][1]),
-                   int(matrix[point+1][0]),
-                   int(matrix[point+1][1]),
-                   screen, color)
-        draw_line( int(matrix[point][0]),
-                   int(matrix[point][1]),
-                   int(matrix[point+2][0]),
-                   int(matrix[point+2][1]),
-                   screen, color)
-        draw_line( int(matrix[point+2][0]),
-                   int(matrix[point+2][1]),
-                   int(matrix[point+1][0]),
-                   int(matrix[point+1][1]),
-                   screen, color)
-        point+=3
+    index = 0
+    while index < len(matrix) - 2:
+        p0 = matrix[index]
+        p1 = matrix[index + 1]
+        p2 = matrix[index + 2]
+        a_vec = create_vector(p0, p1)
+        b_vec = create_vector(p0, p2)
+        surface_vec = cross_product(a_vec, b_vec)
+        if (surface_vec[2] > 0):
+            draw_line(int(p0[0]), int(p0[1]), int(p1[0]), int(p1[1]), screen, color)
+            draw_line(int(p1[0]), int(p1[1]), int(p2[0]), int(p2[1]), screen, color)
+            draw_line(int(p2[0]), int(p2[1]), int(p0[0]), int(p0[1]), screen, color)
+        index += 3
 
 def add_box( points, x, y, z, width, height, depth ):
-    #triangle method
+    x1 = x + width
+    y1 = y - height
+    z1 = z - depth
     #top
-    add_polygon(points, x, y, z, x+width, y, z, x, y, z - depth)
-    add_polygon(points,x+width, y, z, x+width, y, z-depth, x, y, z-depth)
+    add_polygon(points, x, y, z1, x, y, z, x1, y, z)
+    add_polygon(points, x1, y, z1, x, y, z1, x1, y, z)
     #front
-    add_polygon(points, x, y, z, x, y-height, z, x+width, y-height, z)
-    add_polygon(points, x, y, z, x+width, y, z, x+width, y-height, z)
+    add_polygon(points, x, y, z, x, y1, z, x1, y1, z)
+    add_polygon(points, x1, y, z, x, y, z, x1, y1, z)
     #right side
-    add_polygon(points, x+width, y, z, x+width, y-height, z, x+width,y-height,z-depth)
-    add_polygon(points, x+width, y, z, x+width, y, z-depth, x+width, y-height, z-depth)
+    add_polygon(points, x1, y, z, x1, y1, z, x1, y1, z1)
+    add_polygon(points, x1, y, z1, x1, y, z, x1, y1, z1)
     #left side
-    add_polygon(points, x, y, z, x, y, z-depth, x, y-height, z)
-    add_polygon(points, x, y, z-depth, x, y-height, z-depth, x, y-height, z)
+    add_polygon(points, x, y, z1, x, y1, z1, x, y1, z)
+    add_polygon(points,x, y, z, x, y, z1, x, y1, z)
     #bottom
-    add_polygon(points, x, y-height, z, x, y-height, z-depth, x+width, y-height, z-depth)
-    add_polygon(points, x+width, y-height, z, x+width, y-height, z-depth, x, y-height, z)
+    add_polygon(points, x, y1, z, x, y1, z1, x1, y1, z1)
+    add_polygon(points, x1, y1, z, x, y1, z, x1, y1,z1)
     #back
-    add_polygon(points, x, y, z-depth, x+width, y, z-depth, x+width, y-height, z-depth)
-
-    add_polygon(points, x, y, z-depth, x, y-height, z-depth, x+width, y-height, z-depth)
+    add_polygon(points, x1, y, z1, x1, y1, z1, x, y1, z1)
+    add_polygon(points, x, y, z1, x1, y, z1, x, y1, z1)
     '''
     #edge method
     x1 = x + width
@@ -85,26 +81,36 @@ def add_sphere( edges, cx, cy, cz, r, step ):
 
     step += 1
     for lat in range(lat_start, lat_stop):
-        for longt in range(longt_start, longt_stop+1):
+        for longt in range(longt_start, longt_stop):
             index = lat * step + longt
-            add_polygon(edges, points[index][0],
-                     points[index][1],
-                     points[index][2],
-                     points[index][0]+1,
-                     points[index][1]+1,
-                     points[index][2]+1 )
+            next  = (lat + 1) * step + longt
+            if (lat >= lat_stop - 1):
+                next = longt
 
-    # backface culling
-    for triangle in range(0, points.length[0], 3):
-        # calculate n (surface vector)
-        # calculate vec a first
-        a_vec = new_matrix(1, 3)
-        add_point(a_vec, points[triangle + 1][0] - points[triangle][0], points[triangle + 1][1] - points[triangle][1], points[triangle + 1][2] - points[triangle][2])
-        b_vec = new_matrix(1, 3)
-        add_point(b_vec, points[triangle + 2][0] - points[triangle][0], points[triangle + 2][1] - points[triangle][1], points[triangle + 2][2] - points[triangle][2])
-        matrix_mult(a_vec, b_vec) # b_vec is now n (surface vector)
-        #find theta
-        nxv =
+            top = index + 1
+            bottom = next + 1
+
+            add_polygon(edges,
+                        points[index][0],
+                        points[index][1],
+                        points[index][2],
+                        points[top][0],
+                        points[top][1],
+                        points[top][2],
+                        points[next][0],
+                        points[next][1],
+                        points[next][2])
+
+            add_polygon(edges,
+                        points[top][0],
+                        points[top][1],
+                        points[top][2],
+                        points[bottom][0],
+                        points[bottom][1],
+                        points[bottom][2],
+                        points[next][0],
+                        points[next][1],
+                        points[next][2])
 
 def generate_sphere( cx, cy, cz, r, step ):
     #triangle mesh method
@@ -140,18 +146,32 @@ def add_torus( edges, cx, cy, cz, r0, r1, step ):
         for longt in range(longt_start, longt_stop):
             index = lat * step + longt
 
-            add_edge(edges, points[index][0],
-                     points[index][1],
-                     points[index][2],
-                     points[index][0]+1,
-                     points[index][1]+1,
-                     points[index][2]+1 )
+            next = (index + longt_stop) % (lat_stop * longt_stop)
+            top = (index + 1) % (lat_stop * longt_stop)
+            bottom = (index + longt_stop + 1) % (lat_stop * longt_stop)
+
+            add_polygon(edges,
+                        points[index][0],
+                        points[index][1],
+                        points[index][2],
+                        points[top][0],
+                        points[top][1],
+                        points[top][2],
+                        points[next][0],
+                        points[next][1],
+                        points[next][2])
+            add_polygon(edges,
+                        points[top][0],
+                        points[top][1],
+                        points[top][2],
+                        points[bottom][0],
+                        points[bottom][1],
+                        points[bottom][2],
+                        points[next][0],
+                        points[next][1],
+                        points[next][2])
 
 def generate_torus( cx, cy, cz, r0, r1, step ):
-    # triangle method
-
-    
-    ''' edge method
     points = []
     rot_start = 0
     rot_stop = step
@@ -168,7 +188,7 @@ def generate_torus( cx, cy, cz, r0, r1, step ):
             z = -1*math.sin(2*math.pi * rot) * (r0 * math.cos(2*math.pi * circ) + r1) + cz;
 
             points.append([x, y, z])
-    return points'''
+    return points
 
 def add_circle( points, cx, cy, cz, r, step ):
     x0 = r + cx
@@ -211,7 +231,7 @@ def draw_lines( matrix, screen, color ):
                    int(matrix[point][1]),
                    int(matrix[point+1][0]),
                    int(matrix[point+1][1]),
-                   screen, color)    
+                   screen, color)
         point+= 2
 
 def add_edge( matrix, x0, y0, z0, x1, y1, z1 ):
@@ -242,7 +262,7 @@ def draw_line( x0, y0, x1, y1, screen, color ):
     if ( abs(x1-x0) >= abs(y1 - y0) ):
 
         #octant 1
-        if A > 0:            
+        if A > 0:
             d = A + B/2
 
             while x < x1:
